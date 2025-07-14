@@ -381,5 +381,18 @@
         </div>
     </div>
     <script type="module" src="view-jobs.js"></script>
+    <script>
+      // Home button SPA-style navigation to main index.html
+      document.getElementById('homeBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        fetch('../index.html')
+          .then(response => response.text())
+          .then(html => {
+            document.open();
+            document.write(html);
+            document.close();
+          });
+      });
+    </script>
 </body>
 </html> 
