@@ -1084,7 +1084,14 @@ function checkAndShowWelcomeBack(user) {
 
 // Add event listener for Home button
 if (document.getElementById('homeBtn')) {
-    document.getElementById('homeBtn').addEventListener('click', function() {
-        window.location.href = 'https://thenetwork1ng.github.io/JobApk/';
+    document.getElementById('homeBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        fetch('../index.html')
+            .then(response => response.text())
+            .then(html => {
+                document.open();
+                document.write(html);
+                document.close();
+            });
     });
 } 
