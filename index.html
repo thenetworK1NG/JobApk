@@ -1,19 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My PWA</title>
+  <title>Installable PWA</title>
+  <meta name="theme-color" content="#007bff">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
 </head>
 <body>
-  <h1>Hello from My PWA</h1>
-  <p>This is a web app that can be installed!</p>
+  <h1>My Installable Web App</h1>
+  <button id="installBtn" hidden>Install App</button>
+
   <script>
-    // Register the service worker
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    // Listen for install availability
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Stop auto prompt
+      deferredPrompt = e;
+      installBtn.hidden = false; // Show the button
+    });
+
+    installBtn.addEventListener('click', async () => {
+      installBtn.hidden = true;
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install prompt: ${outcome}`);
+        deferredPrompt = null;
+      }
+    });
+
+    // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log("Service Worker registered", reg))
-        .catch(err => console.error("Service Worker error", err));
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch((err) => console.error('Service Worker failed', err));
     }
   </script>
 </body>

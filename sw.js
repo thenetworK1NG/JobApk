@@ -1,23 +1,22 @@
-const cacheName = 'mypwa-v1';
-const assets = [
+const cacheName = 'pwa-cache-v1';
+const filesToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.png'
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(cacheName).then(cache => {
-      return cache.addAll(assets);
-    })
+    caches.open(cacheName)
+      .then(cache => cache.addAll(filesToCache))
   );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(res => {
-      return res || fetch(event.request);
-    })
+    caches.match(event.request)
+      .then(res => res || fetch(event.request))
   );
 });
