@@ -207,6 +207,114 @@
                 font-size: 24px;
             }
         }
+
+        /* Desktop/PC specific styles */
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 500px;
+                padding: 50px;
+            }
+
+            .logo {
+                width: 100px;
+                height: 100px;
+                font-size: 42px;
+                margin-bottom: 40px;
+            }
+
+            h1 {
+                font-size: 32px;
+                margin-bottom: 15px;
+            }
+
+            p {
+                font-size: 18px;
+                margin-bottom: 50px;
+            }
+
+            .job-button {
+                padding: 20px 40px;
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+
+            .install-button {
+                padding: 18px 35px;
+                font-size: 18px;
+            }
+
+            .button-container {
+                gap: 25px;
+            }
+        }
+
+        /* Windows app window styles */
+        @media (display-mode: standalone) and (min-width: 1024px) {
+            body {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+            }
+
+            .container {
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            }
+        }
+
+        /* Handle keyboard navigation */
+        .job-button:focus,
+        .install-button:focus,
+        .back-button:focus {
+            outline: 3px solid #FFF;
+            outline-offset: 2px;
+        }
+
+        /* Desktop cursor styles */
+        .job-button,
+        .install-button,
+        .back-button {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        /* Keyboard shortcut styling */
+        .keyboard-shortcut {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            opacity: 0.7;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        /* Show shortcuts only on desktop */
+        @media (min-width: 1024px) {
+            .keyboard-shortcut {
+                display: inline-block !important;
+            }
+        }
+
+        /* Smooth animations for desktop */
+        @media (prefers-reduced-motion: no-preference) {
+            .container {
+                animation: fadeInUp 0.6s ease-out;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
     </style>
 </head>
 <body>
@@ -218,9 +326,11 @@
         <div class="button-container">
             <button class="job-button" onclick="openApp('view')">
                 📋 View Jobs
+                <span class="keyboard-shortcut" style="display: none;">Ctrl+1</span>
             </button>
             <button class="job-button create" onclick="openApp('create')">
                 ➕ Create Job
+                <span class="keyboard-shortcut" style="display: none;">Ctrl+2</span>
             </button>
         </div>
         
@@ -241,7 +351,7 @@
     <div class="iframe-container" id="iframeContainer">
         <div class="iframe-header">
             <h3 id="appTitle">Job Application</h3>
-            <button class="back-button" onclick="closeApp()">← Back</button>
+            <button class="back-button" onclick="closeApp()" title="Go back (Esc)">← Back</button>
         </div>
         <iframe id="appFrame" class="app-iframe" src=""></iframe>
     </div>
@@ -254,7 +364,52 @@
         function isStandalone() {
             return window.matchMedia('(display-mode: standalone)').matches || 
                    window.navigator.standalone === true ||
-                   document.referrer.includes('android-app://');
+                   document.referrer.includes('android-app://') ||
+                   window.matchMedia('(display-mode: window-controls-overlay)').matches;
+        }
+
+        // Detect platform for better UX
+        function getPlatform() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            if (userAgent.includes('win')) return 'windows';
+            if (userAgent.includes('mac')) return 'macos';
+            if (userAgent.includes('linux')) return 'linux';
+            if (userAgent.includes('android')) return 'android';
+            if (userAgent.includes('iphone') || userAgent.includes('ipad')) return 'ios';
+            return 'unknown';
+        }
+
+        // Update install button text based on platform
+        function updateInstallButtonText() {
+            const platform = getPlatform();
+            const installButton = document.getElementById('installButton');
+            const installText = document.getElementById('installText');
+            
+            switch(platform) {
+                case 'windows':
+                    installButton.innerHTML = '💻 Install on Windows';
+                    installText.textContent = 'Install this app on Windows for desktop notifications and offline access';
+                    break;
+                case 'macos':
+                    installButton.innerHTML = '🍎 Install on Mac';
+                    installText.textContent = 'Install this app on Mac for desktop integration and offline access';
+                    break;
+                case 'linux':
+                    installButton.innerHTML = '🐧 Install on Linux';
+                    installText.textContent = 'Install this app on Linux for desktop integration and offline access';
+                    break;
+                case 'android':
+                    installButton.innerHTML = '📱 Install on Android';
+                    installText.textContent = 'Add this app to your home screen for quick access';
+                    break;
+                case 'ios':
+                    installButton.innerHTML = '📱 Add to Home Screen';
+                    installText.textContent = 'Use Safari\'s share button to add this app to your home screen';
+                    break;
+                default:
+                    installButton.innerHTML = '⬇️ Download App';
+                    installText.textContent = 'Download this app to your device for offline access and better performance';
+            }
         }
 
         // Register service worker for PWA functionality
@@ -278,6 +433,7 @@
             
             // Only show install button if not in standalone mode
             if (!isStandalone()) {
+                updateInstallButtonText(); // Update button text based on platform
                 installButton.style.display = 'block';
                 document.querySelector('.install-container').style.display = 'block';
             }
@@ -368,6 +524,9 @@
 
         // Detect if app is running in standalone mode on page load
         window.addEventListener('DOMContentLoaded', function() {
+            // Update install button text based on platform
+            updateInstallButtonText();
+            
             if (isStandalone()) {
                 // App is installed and running in standalone mode
                 document.body.classList.add('standalone-mode');
@@ -380,7 +539,46 @@
                 document.body.classList.remove('standalone-mode');
                 console.log('App is running in browser mode');
             }
+
+            // Add platform-specific class to body
+            const platform = getPlatform();
+            document.body.classList.add(`platform-${platform}`);
+            
+            // Handle keyboard shortcuts for desktop
+            if (platform === 'windows' || platform === 'macos' || platform === 'linux') {
+                document.addEventListener('keydown', handleKeyboardShortcuts);
+                // Show keyboard shortcuts on desktop
+                const shortcuts = document.querySelectorAll('.keyboard-shortcut');
+                shortcuts.forEach(shortcut => {
+                    shortcut.style.display = 'inline-block';
+                    // Update shortcut text for Mac
+                    if (platform === 'macos') {
+                        shortcut.textContent = shortcut.textContent.replace('Ctrl', 'Cmd');
+                    }
+                });
+            }
         });
+
+        // Keyboard shortcuts for desktop users
+        function handleKeyboardShortcuts(event) {
+            // Ctrl/Cmd + 1 for View Jobs
+            if ((event.ctrlKey || event.metaKey) && event.key === '1') {
+                event.preventDefault();
+                openApp('view');
+            }
+            // Ctrl/Cmd + 2 for Create Jobs
+            if ((event.ctrlKey || event.metaKey) && event.key === '2') {
+                event.preventDefault();
+                openApp('create');
+            }
+            // Escape to go back
+            if (event.key === 'Escape') {
+                const iframeContainer = document.getElementById('iframeContainer');
+                if (iframeContainer.style.display === 'block') {
+                    closeApp();
+                }
+            }
+        }
 
         // Listen for display mode changes
         window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
