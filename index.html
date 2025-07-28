@@ -125,26 +125,36 @@
         .install-button {
             background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 15px 30px;
+            border-radius: 12px;
             color: white;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
-            display: none;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            display: block;
+            width: 100%;
         }
 
         .install-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
         }
 
         .install-text {
-            font-size: 12px;
+            font-size: 14px;
             color: #888;
-            margin-top: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .standalone-mode .install-container {
+            display: none !important;
+        }
+
+        .browser-mode .install-container {
+            display: block;
         }
 
         .iframe-container {
@@ -220,10 +230,10 @@
 
         <div class="install-container">
             <button class="install-button" id="installButton" onclick="installApp()">
-                📱 Install App
+                ⬇️ Download App
             </button>
             <div class="install-text" id="installText">
-                Install this app on your device for quick access
+                Download this app to your device for offline access and better performance
             </div>
         </div>
     </div>
@@ -239,6 +249,13 @@
     <script>
         let deferredPrompt;
         let installButton = document.getElementById('installButton');
+
+        // Check if app is running in standalone mode
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true ||
+                   document.referrer.includes('android-app://');
+        }
 
         // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
@@ -258,8 +275,12 @@
             e.preventDefault();
             // Stash the event so it can be triggered later.
             deferredPrompt = e;
-            // Show the install button
-            installButton.style.display = 'block';
+            
+            // Only show install button if not in standalone mode
+            if (!isStandalone()) {
+                installButton.style.display = 'block';
+                document.querySelector('.install-container').style.display = 'block';
+            }
         });
 
         // Install app function
@@ -271,8 +292,8 @@
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
                         console.log('User accepted the install prompt');
-                        installButton.style.display = 'none';
-                        document.getElementById('installText').textContent = 'App installed successfully!';
+                        document.querySelector('.install-container').style.display = 'none';
+                        document.getElementById('installText').textContent = 'App downloaded successfully!';
                     } else {
                         console.log('User dismissed the install prompt');
                     }
@@ -284,8 +305,9 @@
         // Handle app installed event
         window.addEventListener('appinstalled', (evt) => {
             console.log('App was installed');
-            installButton.style.display = 'none';
-            document.getElementById('installText').textContent = 'App installed successfully!';
+            document.querySelector('.install-container').style.display = 'none';
+            document.body.classList.add('standalone-mode');
+            document.body.classList.remove('browser-mode');
         });
 
         const apps = {
@@ -344,13 +366,31 @@
             }
         });
 
-        // Detect if app is running in standalone mode
+        // Detect if app is running in standalone mode on page load
         window.addEventListener('DOMContentLoaded', function() {
-            if (window.matchMedia('(display-mode: standalone)').matches || 
-                window.navigator.standalone === true) {
-                // Hide the install button if already installed
-                installButton.style.display = 'none';
-                document.getElementById('installText').textContent = 'App is running in standalone mode';
+            if (isStandalone()) {
+                // App is installed and running in standalone mode
+                document.body.classList.add('standalone-mode');
+                document.body.classList.remove('browser-mode');
+                document.querySelector('.install-container').style.display = 'none';
+                console.log('App is running in standalone mode');
+            } else {
+                // App is running in browser
+                document.body.classList.add('browser-mode');
+                document.body.classList.remove('standalone-mode');
+                console.log('App is running in browser mode');
+            }
+        });
+
+        // Listen for display mode changes
+        window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+            if (e.matches) {
+                document.body.classList.add('standalone-mode');
+                document.body.classList.remove('browser-mode');
+                document.querySelector('.install-container').style.display = 'none';
+            } else {
+                document.body.classList.add('browser-mode');
+                document.body.classList.remove('standalone-mode');
             }
         });
     </script>
