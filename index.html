@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job System App</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Job System">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Job System">
+    <meta name="msapplication-TileColor" content="#2196F3">
+    <meta name="msapplication-TileImage" content="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .job-button {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            border: none;
+            padding: 18px 30px;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .job-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+        }
+
+        .job-button:active {
+            transform: translateY(0);
+        }
+
+        .job-button.create {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .job-button.create:hover {
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .install-container {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .install-button {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+            display: none;
+        }
+
+        .install-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .install-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+        }
+
+        .iframe-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+        }
+
+        .iframe-header {
+            background: #2196F3;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .app-iframe {
+            width: 100%;
+            height: calc(100% - 60px);
+            border: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">JS</div>
+        <h1>Job System</h1>
+        <p>Manage your jobs efficiently</p>
+        
+        <div class="button-container">
+            <button class="job-button" onclick="openApp('view')">
+                📋 View Jobs
+            </button>
+            <button class="job-button create" onclick="openApp('create')">
+                ➕ Create Job
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            Loading application...
+        </div>
+
+        <div class="install-container">
+            <button class="install-button" id="installButton" onclick="installApp()">
+                📱 Install App
+            </button>
+            <div class="install-text" id="installText">
+                Install this app on your device for quick access
+            </div>
+        </div>
+    </div>
+
+    <div class="iframe-container" id="iframeContainer">
+        <div class="iframe-header">
+            <h3 id="appTitle">Job Application</h3>
+            <button class="back-button" onclick="closeApp()">← Back</button>
+        </div>
+        <iframe id="appFrame" class="app-iframe" src=""></iframe>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        let installButton = document.getElementById('installButton');
+
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    }, function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Handle PWA install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Show the install button
+            installButton.style.display = 'block';
+        });
+
+        // Install app function
+        function installApp() {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        installButton.style.display = 'none';
+                        document.getElementById('installText').textContent = 'App installed successfully!';
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        // Handle app installed event
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App was installed');
+            installButton.style.display = 'none';
+            document.getElementById('installText').textContent = 'App installed successfully!';
+        });
+
+        const apps = {
+            view: 'https://thenetwork1ng.github.io/view_jobs_app/',
+            create: 'https://thenetwork1ng.github.io/create-jobs-app/'
+        };
+
+        const titles = {
+            view: 'View Jobs',
+            create: 'Create Job'
+        };
+
+        function openApp(type) {
+            const loading = document.getElementById('loading');
+            const container = document.querySelector('.container');
+            const iframeContainer = document.getElementById('iframeContainer');
+            const appFrame = document.getElementById('appFrame');
+            const appTitle = document.getElementById('appTitle');
+
+            // Push state for browser back button
+            history.pushState({app: type}, titles[type], `#${type}`);
+
+            // Show loading
+            loading.style.display = 'block';
+
+            // Set iframe source and title
+            appFrame.src = apps[type];
+            appTitle.textContent = titles[type];
+
+            // Hide main container and show iframe after a short delay
+            setTimeout(() => {
+                container.style.display = 'none';
+                iframeContainer.style.display = 'block';
+                loading.style.display = 'none';
+            }, 1000);
+        }
+
+        function closeApp() {
+            const container = document.querySelector('.container');
+            const iframeContainer = document.getElementById('iframeContainer');
+            const appFrame = document.getElementById('appFrame');
+
+            // Hide iframe and show main container
+            iframeContainer.style.display = 'none';
+            container.style.display = 'block';
+
+            // Clear iframe source to stop loading
+            appFrame.src = '';
+        }
+
+        // Handle back button in browser
+        window.addEventListener('popstate', function(event) {
+            const iframeContainer = document.getElementById('iframeContainer');
+            if (iframeContainer.style.display === 'block') {
+                closeApp();
+            }
+        });
+
+        // Detect if app is running in standalone mode
+        window.addEventListener('DOMContentLoaded', function() {
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                // Hide the install button if already installed
+                installButton.style.display = 'none';
+                document.getElementById('installText').textContent = 'App is running in standalone mode';
+            }
+        });
+    </script>
+</body>
+</html>
