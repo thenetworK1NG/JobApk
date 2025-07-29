@@ -71,6 +71,18 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "Job Calculator",
+      "short_name": "Calculator",
+      "description": "Open job card calculator (Ctrl+3)",
+      "url": "./index.html#calculator",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

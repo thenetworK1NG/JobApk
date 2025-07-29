@@ -109,6 +109,15 @@
             box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
         }
 
+        .job-button.calculator {
+            background: linear-gradient(45deg, #FF9800, #FFB74D);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .job-button.calculator:hover {
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
+        }
+
         .loading {
             display: none;
             margin-top: 20px;
@@ -332,6 +341,10 @@
                 ➕ Create Job
                 <span class="keyboard-shortcut" style="display: none;">Ctrl+2</span>
             </button>
+            <button class="job-button calculator" onclick="openApp('calculator')">
+                🧮 Calculator
+                <span class="keyboard-shortcut" style="display: none;">Ctrl+3</span>
+            </button>
         </div>
         
         <div class="loading" id="loading">
@@ -468,12 +481,14 @@
 
         const apps = {
             view: 'https://thenetwork1ng.github.io/view_jobs_app/',
-            create: 'https://thenetwork1ng.github.io/create-jobs-app/'
+            create: 'https://thenetwork1ng.github.io/create-jobs-app/',
+            calculator: 'https://thenetwork1ng.github.io/jobcard-calculator/'
         };
 
         const titles = {
             view: 'View Jobs',
-            create: 'Create Job'
+            create: 'Create Job',
+            calculator: 'Job Calculator'
         };
 
         function openApp(type) {
@@ -570,6 +585,11 @@
             if ((event.ctrlKey || event.metaKey) && event.key === '2') {
                 event.preventDefault();
                 openApp('create');
+            }
+            // Ctrl/Cmd + 3 for Calculator
+            if ((event.ctrlKey || event.metaKey) && event.key === '3') {
+                event.preventDefault();
+                openApp('calculator');
             }
             // Escape to go back
             if (event.key === 'Escape') {

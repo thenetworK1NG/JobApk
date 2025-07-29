@@ -1,4 +1,4 @@
-const CACHE_NAME = 'job-system-v1.1';
+const CACHE_NAME = 'job-system-v1.2';
 const urlsToCache = [
   './',
   './index.html',
