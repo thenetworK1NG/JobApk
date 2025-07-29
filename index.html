@@ -118,6 +118,15 @@
             box-shadow: 0 8px 25px rgba(255, 152, 0, 0.4);
         }
 
+        .job-button.board {
+            background: linear-gradient(45deg, #9C27B0, #BA68C8);
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        .job-button.board:hover {
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.4);
+        }
+
         .loading {
             display: none;
             margin-top: 20px;
@@ -345,6 +354,10 @@
                 🧮 Calculator
                 <span class="keyboard-shortcut" style="display: none;">Ctrl+3</span>
             </button>
+            <button class="job-button board" onclick="openApp('board')">
+                📊 Board
+                <span class="keyboard-shortcut" style="display: none;">Ctrl+4</span>
+            </button>
         </div>
         
         <div class="loading" id="loading">
@@ -482,13 +495,15 @@
         const apps = {
             view: 'https://thenetwork1ng.github.io/view_jobs_app/',
             create: 'https://thenetwork1ng.github.io/create-jobs-app/',
-            calculator: 'https://thenetwork1ng.github.io/jobcard-calculator/'
+            calculator: 'https://thenetwork1ng.github.io/jobcard-calculator/',
+            board: 'https://board.maphefosigns.co.za/?controller=BoardViewController&action=show&plugin=&project_id=1&search=status%3Aopen'
         };
 
         const titles = {
             view: 'View Jobs',
             create: 'Create Job',
-            calculator: 'Job Calculator'
+            calculator: 'Job Calculator',
+            board: 'Board System'
         };
 
         function openApp(type) {
@@ -590,6 +605,11 @@
             if ((event.ctrlKey || event.metaKey) && event.key === '3') {
                 event.preventDefault();
                 openApp('calculator');
+            }
+            // Ctrl/Cmd + 4 for Board
+            if ((event.ctrlKey || event.metaKey) && event.key === '4') {
+                event.preventDefault();
+                openApp('board');
             }
             // Escape to go back
             if (event.key === 'Escape') {

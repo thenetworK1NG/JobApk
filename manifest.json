@@ -83,6 +83,18 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "Board System",
+      "short_name": "Board",
+      "description": "Access board management system (Ctrl+4)",
+      "url": "./index.html#board",
+      "icons": [
+        {
+          "src": "./icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
