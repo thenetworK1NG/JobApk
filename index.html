@@ -409,19 +409,11 @@
         const video = document.getElementById('backgroundVideo');
         const overlay = document.getElementById('videoOverlay');
         
-        // Check if this is a refresh attempt
-        const hasRefreshed = sessionStorage.getItem('hasRefreshed');
-        
         // Function to show video when it's ready
         function showVideo() {
             video.classList.add('loaded');
             overlay.classList.add('loaded');
             document.body.classList.add('video-loaded');
-            console.log('Video loaded successfully');
-            // Clear any pending refresh since video loaded
-            if (window.refreshTimeout) {
-                clearTimeout(window.refreshTimeout);
-            }
         }
         
         // Function to handle video loading
@@ -431,44 +423,21 @@
             }
         }
         
-        // Enhanced video loading detection
+        // Event listeners for video loading
         video.addEventListener('canplay', showVideo);
-        video.addEventListener('canplaythrough', showVideo);
         video.addEventListener('loadeddata', handleVideoLoad);
         video.addEventListener('playing', showVideo);
-        video.addEventListener('loadstart', () => {
-            console.log('Video started loading');
-        });
         
-        // Force video to load
-        video.load();
+        // Fallback: force show video after 3 seconds if still not loaded
+        setTimeout(() => {
+            if (!video.classList.contains('loaded')) {
+                showVideo();
+            }
+        }, 3000);
         
         // Check if video is already loaded (for cached videos)
         if (video.readyState >= 3) {
             showVideo();
-        }
-        
-        // Auto-refresh functionality - only refresh once if video doesn't load
-        if (!hasRefreshed) {
-            window.refreshTimeout = setTimeout(() => {
-                if (!video.classList.contains('loaded')) {
-                    console.log('Video failed to load, refreshing page...');
-                    sessionStorage.setItem('hasRefreshed', 'true');
-                    location.reload(true); // Hard refresh
-                } else {
-                    console.log('Video loaded, no refresh needed');
-                }
-            }, 5000);
-        } else {
-            // If we've already refreshed once, force show video after 2 seconds
-            setTimeout(() => {
-                if (!video.classList.contains('loaded')) {
-                    console.log('Forcing video display after refresh attempt');
-                    showVideo();
-                }
-                // Clear the refresh flag for next session
-                sessionStorage.removeItem('hasRefreshed');
-            }, 2000);
         }
     </script>
     
@@ -647,13 +616,6 @@
             console.log('Opening app type:', type);
             console.log('URL being loaded:', apps[type]);
             console.log('Apps object:', apps);
-
-            // For create jobs, open in new tab instead of iframe due to CORS/loading issues
-            if (type === 'create') {
-                console.log('Opening create jobs in new tab');
-                window.open(apps[type], '_blank');
-                return;
-            }
 
             // Push state for browser back button
             history.pushState({app: type}, titles[type], `#${type}`);
