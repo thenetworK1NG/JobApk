@@ -34,6 +34,28 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            /* Fallback gradient background while video loads */
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            background-attachment: fixed;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        /* Gradient animation for fallback */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Video background */
@@ -43,8 +65,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: -2;
             object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* Show video when it's ready */
+        .video-background.loaded {
+            opacity: 1;
+        }
+
+        /* Hide gradient when video is loaded */
+        body.video-loaded {
+            animation: none;
+            background: transparent;
         }
 
         /* Overlay to ensure text readability */
@@ -56,6 +91,13 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.4);
             z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* Show overlay when video is loaded */
+        .video-overlay.loaded {
+            opacity: 1;
         }
 
         .container {
@@ -354,13 +396,50 @@
 </head>
 <body>
     <!-- Video Background -->
-    <video class="video-background" autoplay muted loop playsinline>
+    <video class="video-background" autoplay muted loop playsinline id="backgroundVideo">
         <source src="back.mp4" type="video/mp4">
         <!-- Fallback for browsers that don't support video -->
         Your browser does not support the video tag.
     </video>
     <!-- Video Overlay for better text readability -->
-    <div class="video-overlay"></div>
+    <div class="video-overlay" id="videoOverlay"></div>
+    
+    <script>
+        // Handle video loading
+        const video = document.getElementById('backgroundVideo');
+        const overlay = document.getElementById('videoOverlay');
+        
+        // Function to show video when it's ready
+        function showVideo() {
+            video.classList.add('loaded');
+            overlay.classList.add('loaded');
+            document.body.classList.add('video-loaded');
+        }
+        
+        // Function to handle video loading
+        function handleVideoLoad() {
+            if (video.readyState >= 3) { // HAVE_FUTURE_DATA or higher
+                showVideo();
+            }
+        }
+        
+        // Event listeners for video loading
+        video.addEventListener('canplay', showVideo);
+        video.addEventListener('loadeddata', handleVideoLoad);
+        video.addEventListener('playing', showVideo);
+        
+        // Fallback: force show video after 3 seconds if still not loaded
+        setTimeout(() => {
+            if (!video.classList.contains('loaded')) {
+                showVideo();
+            }
+        }, 3000);
+        
+        // Check if video is already loaded (for cached videos)
+        if (video.readyState >= 3) {
+            showVideo();
+        }
+    </script>
     
     <div class="container">
         <div class="logo">JS</div>
