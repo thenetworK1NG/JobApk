@@ -439,6 +439,12 @@
         if (video.readyState >= 3) {
             showVideo();
         }
+        
+        // Auto-refresh functionality - refresh page after 5 seconds
+        setTimeout(() => {
+            console.log('Auto-refreshing page after 5 seconds...');
+            location.reload(true); // true forces a hard refresh like Alt+F5
+        }, 5000);
     </script>
     
     <div class="container">
