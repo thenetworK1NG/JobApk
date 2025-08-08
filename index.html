@@ -26,30 +26,36 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%),
-                linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-size: 400% 400%;
-            background-attachment: fixed;
-            animation: gradientShift 15s ease infinite;
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes gradientShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        /* Video background */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            object-fit: cover;
+        }
+
+        /* Overlay to ensure text readability */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
         }
 
         .container {
@@ -58,12 +64,14 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.15),
+                0 25px 50px rgba(0, 0, 0, 0.25),
                 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
             padding: 40px;
             max-width: 400px;
             width: 90%;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         .logo {
@@ -282,13 +290,8 @@
 
         /* Windows app window styles */
         @media (display-mode: standalone) and (min-width: 1024px) {
-            body {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-            }
-
             .container {
-                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
             }
         }
 
@@ -350,6 +353,15 @@
     </style>
 </head>
 <body>
+    <!-- Video Background -->
+    <video class="video-background" autoplay muted loop playsinline>
+        <source src="back.mp4" type="video/mp4">
+        <!-- Fallback for browsers that don't support video -->
+        Your browser does not support the video tag.
+    </video>
+    <!-- Video Overlay for better text readability -->
+    <div class="video-overlay"></div>
+    
     <div class="container">
         <div class="logo">JS</div>
         <h1>Job System</h1>
@@ -521,15 +533,43 @@
             const appFrame = document.getElementById('appFrame');
             const appTitle = document.getElementById('appTitle');
 
+            // Debug logging to verify correct URL
+            console.log('Opening app type:', type);
+            console.log('URL being loaded:', apps[type]);
+            console.log('Apps object:', apps);
+
+            // For create jobs, open in new tab instead of iframe due to CORS/loading issues
+            if (type === 'create') {
+                console.log('Opening create jobs in new tab');
+                window.open(apps[type], '_blank');
+                return;
+            }
+
             // Push state for browser back button
             history.pushState({app: type}, titles[type], `#${type}`);
 
             // Show loading
             loading.style.display = 'block';
 
-            // Set iframe source and title
-            appFrame.src = apps[type];
+            // Clear previous iframe content
+            appFrame.src = '';
+            
+            // Set iframe source and title with cache busting
+            const timestamp = new Date().getTime();
+            const finalUrl = apps[type] + '?v=' + timestamp;
+            console.log('Final URL with timestamp:', finalUrl);
+            
+            appFrame.src = finalUrl;
             appTitle.textContent = titles[type];
+
+            // Add iframe load event listener for debugging
+            appFrame.onload = function() {
+                console.log('Iframe loaded successfully');
+            };
+            
+            appFrame.onerror = function() {
+                console.log('Iframe failed to load');
+            };
 
             // Hide main container and show iframe after a short delay
             setTimeout(() => {
