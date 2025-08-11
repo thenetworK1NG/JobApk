@@ -459,6 +459,10 @@
                 🧮 Calculator
                 <span class="keyboard-shortcut" style="display: none;">Ctrl+3</span>
             </button>
+            <button class="job-button" onclick="openApp('tracking')">
+                🚚 Track Order
+                <span class="keyboard-shortcut" style="display: none;">Ctrl+4</span>
+            </button>
         </div>
         
         <div class="loading" id="loading">
@@ -596,13 +600,15 @@
         const apps = {
             view: 'https://thenetwork1ng.github.io/view_jobs_app/',
             create: 'https://thenetwork1ng.github.io/create-jobs-app/',
-            calculator: 'https://thenetwork1ng.github.io/jobcard-calculator/'
+            calculator: 'https://thenetwork1ng.github.io/jobcard-calculator/',
+            tracking: 'https://thenetwork1ng.github.io/tracking/'
         };
 
         const titles = {
             view: 'View Jobs',
             create: 'Create Job',
-            calculator: 'Job Calculator'
+            calculator: 'Job Calculator',
+            tracking: 'Order Tracking'
         };
 
         function openApp(type) {
@@ -725,6 +731,11 @@
             if ((event.ctrlKey || event.metaKey) && event.key === '3') {
                 event.preventDefault();
                 openApp('calculator');
+            }
+            // Ctrl/Cmd + 4 for Tracking
+            if ((event.ctrlKey || event.metaKey) && event.key === '4') {
+                event.preventDefault();
+                openApp('tracking');
             }
             // Escape to go back
             if (event.key === 'Escape') {
