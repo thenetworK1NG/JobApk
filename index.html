@@ -487,11 +487,11 @@
         </div>
 
         <div class="install-container">
-            <button class="install-button" id="installButton" onclick="installApp()">
-                ⬇️ Download App
+            <button class="install-button" id="installBtn" style="display:none;">
+                📲 Install App
             </button>
             <div class="install-text" id="installText">
-                Download this app to your device for offline access and better performance
+                Install this app for a full Android/iOS experience. After install, it will work like a real app!
             </div>
         </div>
     </div>
@@ -505,60 +505,28 @@
     </div>
 
     <script>
+        // PWA install prompt logic (like demo)
         let deferredPrompt;
-        let installButton = document.getElementById('installButton');
-
-        // Check if app is running in standalone mode
-        function isStandalone() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone === true ||
-                   document.referrer.includes('android-app://') ||
-                   window.matchMedia('(display-mode: window-controls-overlay)').matches;
-        }
-
-        // Detect platform for better UX
-        function getPlatform() {
-            const userAgent = navigator.userAgent.toLowerCase();
-            if (userAgent.includes('win')) return 'windows';
-            if (userAgent.includes('mac')) return 'macos';
-            if (userAgent.includes('linux')) return 'linux';
-            if (userAgent.includes('android')) return 'android';
-            if (userAgent.includes('iphone') || userAgent.includes('ipad')) return 'ios';
-            return 'unknown';
-        }
-
-        // Update install button text based on platform
-        function updateInstallButtonText() {
-            const platform = getPlatform();
-            const installButton = document.getElementById('installButton');
-            const installText = document.getElementById('installText');
-            
-            switch(platform) {
-                case 'windows':
-                    installButton.innerHTML = '💻 Install on Windows';
-                    installText.textContent = 'Install this app on Windows for desktop notifications and offline access';
-                    break;
-                case 'macos':
-                    installButton.innerHTML = '🍎 Install on Mac';
-                    installText.textContent = 'Install this app on Mac for desktop integration and offline access';
-                    break;
-                case 'linux':
-                    installButton.innerHTML = '🐧 Install on Linux';
-                    installText.textContent = 'Install this app on Linux for desktop integration and offline access';
-                    break;
-                case 'android':
-                    installButton.innerHTML = '📱 Install on Android';
-                    installText.textContent = 'Add this app to your home screen for quick access';
-                    break;
-                case 'ios':
-                    installButton.innerHTML = '📱 Add to Home Screen';
-                    installText.textContent = 'Use Safari\'s share button to add this app to your home screen';
-                    break;
-                default:
-                    installButton.innerHTML = '⬇️ Download App';
-                    installText.textContent = 'Download this app to your device for offline access and better performance';
+        const installBtn = document.getElementById('installBtn');
+        installBtn.style.display = 'none';
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = '';
+        });
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
             }
-        }
+        });
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+        });
 
         // Register service worker for PWA functionality
         if ('serviceWorker' in navigator) {
