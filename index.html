@@ -95,6 +95,21 @@
             transition: opacity 0.5s ease-in-out;
         }
 
+        .frosted-glass {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(18px) saturate(120%);
+            -webkit-backdrop-filter: blur(18px) saturate(120%);
+            opacity: 1;
+            transition: opacity 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
         /* Show overlay when video is loaded */
         .video-overlay.loaded {
             opacity: 1;
@@ -403,6 +418,8 @@
     </video>
     <!-- Video Overlay for better text readability -->
     <div class="video-overlay" id="videoOverlay"></div>
+    <!-- Frosted Glass Overlay -->
+    <div class="frosted-glass" id="frostedGlass"></div>
     
     <script>
         // Handle video loading
@@ -617,6 +634,7 @@
             const iframeContainer = document.getElementById('iframeContainer');
             const appFrame = document.getElementById('appFrame');
             const appTitle = document.getElementById('appTitle');
+            const frostedGlass = document.getElementById('frostedGlass');
 
             // Debug logging to verify correct URL
             console.log('Opening app type:', type);
@@ -649,6 +667,12 @@
                 console.log('Iframe failed to load');
             };
 
+            // Fade out frosted glass overlay
+            frostedGlass.style.opacity = '1';
+            setTimeout(() => {
+                frostedGlass.style.opacity = '0';
+            }, 200); // Start fade after short delay
+
             // Hide main container and show iframe after a short delay
             setTimeout(() => {
                 container.style.display = 'none';
@@ -656,15 +680,18 @@
                 loading.style.display = 'none';
             }, 1000);
         }
-
         function closeApp() {
             const container = document.querySelector('.container');
             const iframeContainer = document.getElementById('iframeContainer');
             const appFrame = document.getElementById('appFrame');
+            const frostedGlass = document.getElementById('frostedGlass');
 
             // Hide iframe and show main container
             iframeContainer.style.display = 'none';
             container.style.display = 'block';
+
+            // Reset frosted glass overlay
+            frostedGlass.style.opacity = '1';
 
             // Clear iframe source to stop loading
             appFrame.src = '';
