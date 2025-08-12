@@ -87,12 +87,21 @@
             👤 Track by Name
         </button>
     </div>    <script>
-        function selectTrackingMethod(method) {
+        // Listen for messages from child frames
+        window.addEventListener('message', function(event) {
+            if (event.data.action === 'back') {
+                // If it's a back action, reload the tracking tools page
+                window.location.reload();
+            }
+        });        function selectTrackingMethod(method) {
+            const trackingToolsUrl = window.location.href;
             if (method === 'name') {
-                window.location.href = 'https://thenetwork1ng.github.io/search-task-by-name/';
+                window.location.href = 'https://thenetwork1ng.github.io/search-task-by-name/?back=' + encodeURIComponent(trackingToolsUrl);
+            } else if (method === 'keygen') {
+                window.location.href = 'https://thenetwork1ng.github.io/job-track-code-generator/?back=' + encodeURIComponent(trackingToolsUrl);
             } else {
                 // Send message to parent window for order tracking
-                window.parent.postMessage({ trackingMethod: method }, '*');
+                window.parent.postMessage({ trackingMethod: method, backUrl: trackingToolsUrl }, '*');
             }
         }
     </script>
