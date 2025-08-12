@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .options-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .tracking-button {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
+        }
+
+        .tracking-button:last-child {
+            margin-bottom: 0;
+        }
+
+        .tracking-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .tracking-button:active {
+            transform: translateY(0);
+        }
+
+        .tracking-button.order-number {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+        }        .tracking-button.by-name {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+        }
+
+        .tracking-button.key-gen {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+        }
+    </style>
+</head>
+<body>    <div class="options-container">
+        <h2>Tracking Tools</h2>
+        <button class="tracking-button order-number" onclick="selectTrackingMethod('order')">
+            📦 Job Tracker
+        </button>
+        <button class="tracking-button key-gen" onclick="selectTrackingMethod('keygen')">
+            🔑 Tracking Key Gen
+        </button>
+        <button class="tracking-button by-name" onclick="selectTrackingMethod('name')">
+            👤 Track by Name
+        </button>
+    </div>    <script>
+        function selectTrackingMethod(method) {
+            if (method === 'name') {
+                window.location.href = 'https://thenetwork1ng.github.io/search-task-by-name/';
+            } else {
+                // Send message to parent window for order tracking
+                window.parent.postMessage({ trackingMethod: method }, '*');
+            }
+        }
+    </script>
+</body>
+</html>

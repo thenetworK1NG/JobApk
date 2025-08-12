@@ -475,8 +475,7 @@
             <button class="job-button calculator" onclick="openApp('calculator')">
                 🧮 Calculator
                 <span class="keyboard-shortcut" style="display: none;">Ctrl+3</span>
-            </button>
-            <button class="job-button" onclick="openApp('tracking')">
+            </button>            <button class="job-button" onclick="showTrackingOptions()">
                 🚚 Track Order
                 <span class="keyboard-shortcut" style="display: none;">Ctrl+4</span>
             </button>
@@ -580,13 +579,12 @@
             document.querySelector('.install-container').style.display = 'none';
             document.body.classList.add('standalone-mode');
             document.body.classList.remove('browser-mode');
-        });
-
-        const apps = {
+        });        const apps = {
             view: 'https://thenetwork1ng.github.io/view_jobs_app/',
             create: 'https://thenetwork1ng.github.io/create-jobs-app/',
             calculator: 'https://thenetwork1ng.github.io/jobcard-calculator/',
-            tracking: 'https://thenetwork1ng.github.io/tracking/'
+            tracking: 'https://thenetwork1ng.github.io/tracking/',
+            trackingByName: 'https://thenetwork1ng.github.io/tracking-by-name/'
         };
 
         const titles = {
@@ -647,7 +645,40 @@
                 iframeContainer.style.display = 'block';
                 loading.style.display = 'none';
             }, 1000);
+        }        function showTrackingOptions() {
+            const container = document.querySelector('.container');
+            const iframeContainer = document.getElementById('iframeContainer');
+            const appFrame = document.getElementById('appFrame');
+            const appTitle = document.getElementById('appTitle');
+            const frostedGlass = document.getElementById('frostedGlass');
+
+            // Push state for browser back button
+            history.pushState({app: 'tracking-options'}, 'Tracking Options', '#tracking-options');
+
+            // Set iframe source to tracking options page
+            appFrame.src = 'tracking-options.html';
+            appTitle.textContent = 'Select Tracking Method';
+
+            // Hide main container and show iframe
+            container.style.display = 'none';
+            iframeContainer.style.display = 'block';
+
+            // Fade out frosted glass overlay
+            frostedGlass.style.opacity = '1';
+            setTimeout(() => {
+                frostedGlass.style.opacity = '0';
+            }, 200);
         }
+
+        // Listen for messages from the tracking options iframe
+        window.addEventListener('message', function(event) {
+            if (event.data.trackingMethod === 'order') {
+                openApp('tracking');
+            } else if (event.data.trackingMethod === 'name') {
+                openApp('trackingByName');
+            }
+        });
+
         function closeApp() {
             const container = document.querySelector('.container');
             const iframeContainer = document.getElementById('iframeContainer');
@@ -726,11 +757,10 @@
             if ((event.ctrlKey || event.metaKey) && event.key === '3') {
                 event.preventDefault();
                 openApp('calculator');
-            }
-            // Ctrl/Cmd + 4 for Tracking
+            }            // Ctrl/Cmd + 4 for Tracking
             if ((event.ctrlKey || event.metaKey) && event.key === '4') {
                 event.preventDefault();
-                openApp('tracking');
+                showTrackingOptions();
             }
             // Escape to go back
             if (event.key === 'Escape') {
